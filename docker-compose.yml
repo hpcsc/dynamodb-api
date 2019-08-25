@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  dynamodb:
+    image: amazon/dynamodb-local:1.11.477
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb"]
+    ports:
+      - 8000:8000
+
+  migration:
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    depends_on:
+      - dynamodb
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      
+  api:
+    build:
+      context: .
+    depends_on:
+      - migration
+    ports:
+      - 80:80
+    environment:
+      - "DYNAMO_URL=http://dynamodb:8000"
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
