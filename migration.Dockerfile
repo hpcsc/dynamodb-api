@@ -2,7 +2,7 @@ FROM jwilder/dockerize:0.6.1
 
 WORKDIR /app
 
-ADD ./create-and-seed.sh .
+ADD ./create-table.sh .
 
 ENV PATH="~/.local/bin:${PATH}"
 RUN apk -Uuv add groff less python py-pip curl && \
@@ -12,4 +12,4 @@ RUN apk -Uuv add groff less python py-pip curl && \
     apk --purge -v del py-pip && \
     rm /var/cache/apk/*
     
-ENTRYPOINT dockerize -wait tcp://dynamodb:8000 && ./create-and-seed.sh
+ENTRYPOINT dockerize -wait tcp://dynamodb:8000 && ./create-table.sh

@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Newtonsoft.Json;
 
 namespace DynamoDBApi.Models
 {
@@ -10,38 +12,32 @@ namespace DynamoDBApi.Models
     public class WidgetState
     {
         [DynamoDBHashKey]
-        public int UserId { get; private set; }
-        [DynamoDBRangeKey]
         public int OrganizationId { get; private set; }
-        [DynamoDBProperty]
+        [DynamoDBRangeKey]
+        public string SortKey { get; private set; }
+        public int? UserId { get; private set; }
         public string WidgetName { get; private set; }
-        [DynamoDBProperty("States", typeof(StatesConverter))]
-        public ImmutableDictionary<string, DynamoDBEntry> States { get; private set; }
-
+        [DynamoDBProperty("States", typeof(StatesJsonConverter))]
+        public dynamic States { get; private set; }
 
         public WidgetState()
         {
         }
 
-        public WidgetState(int userId, int organizationId, string widgetName)
+        public WidgetState(int organizationId, int? userId, string widgetName, dynamic states)
         {
             UserId = userId;
             OrganizationId = organizationId;
+            SortKey = CombineIntoCompositeKey(userId, widgetName);
             WidgetName = widgetName;
+            States = states;
+        }
+
+        private string CombineIntoCompositeKey(int? userId, string widgetName)
+        {
+            var userIdValue = userId.HasValue ? userId.Value.ToString() : string.Empty;
+            return $"{userIdValue}-{widgetName}";
         }
     }
     
-    public class StatesConverter : IPropertyConverter
-    {
-        public DynamoDBEntry ToEntry(object value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public object FromEntry(DynamoDBEntry entry)
-        {
-            var document = entry.AsDocument();
-            return document.ToImmutableDictionary();
-        }
-    }
 }

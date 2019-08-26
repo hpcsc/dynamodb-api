@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DynamoDBApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/organization/{organizationId}")]
     [ApiController]
     public class WidgetStatesController : ControllerBase
     {
@@ -19,11 +19,32 @@ namespace DynamoDBApi.Controllers
             _widgetStateRepository = widgetStateRepository;
         }
         
-        // GET api/values/5
-        [HttpGet("organization/{organizationId}/user/{userId}")]
-        public async Task<ActionResult<WidgetState>> Get(int organizationId, int userId)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<WidgetState>>> GetByOrganization(int organizationId)
         {
-            return await _widgetStateRepository.FindBy(userId, organizationId);
+            var widgetStates = await _widgetStateRepository.FindBy(organizationId);
+            return Ok(widgetStates);
+        }
+        
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<WidgetState>>> Get(int organizationId, int userId)
+        {
+            var widgetStates = await _widgetStateRepository.FindBy(organizationId, userId);
+            return Ok(widgetStates);
+        }
+        
+        [HttpPut("user/{userId}/widget/{widgetName}")]
+        public async Task<ActionResult> UpdateWidgetStateForUser(int organizationId, int userId, string widgetName, [FromBody]dynamic states)
+        {
+            await _widgetStateRepository.Update(organizationId, userId, widgetName, states);
+            return Ok();
+        }
+        
+        [HttpPut("widget/{widgetName}")]
+        public async Task<ActionResult> UpdateWidgetStateForOrganization(int organizationId, string widgetName, [FromBody]dynamic states)
+        {
+            await _widgetStateRepository.Update(organizationId, null, widgetName, states);
+            return Ok();
         }
     }
 }
