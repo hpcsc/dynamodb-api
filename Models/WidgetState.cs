@@ -35,8 +35,11 @@ namespace DynamoDBApi.Models
 
         private string CombineIntoCompositeKey(int? userId, string widgetName)
         {
-            var userIdValue = userId.HasValue ? userId.Value.ToString() : string.Empty;
-            return $"{userIdValue}-{widgetName}";
+            var userOrOrgKey = userId.HasValue ? 
+                "user-" + userId.Value : 
+                "org";
+            
+            return $"{userOrOrgKey}-widget-{widgetName}";
         }
     }
     

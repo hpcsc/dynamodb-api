@@ -35,7 +35,7 @@ namespace DynamoDBApi.Repositories
                     ExpressionAttributeValues = new Dictionary<string, AttributeValue>
                     {
                         {":organizationId", new AttributeValue {N = organizationId.ToString()}},
-                        {":sortKey", new AttributeValue {S = userId.ToString()}}
+                        {":sortKey", new AttributeValue {S = "user-" + userId}}
                     }
                 };
                 
@@ -55,7 +55,7 @@ namespace DynamoDBApi.Repositories
                     ExpressionAttributeValues = new Dictionary<string, AttributeValue>
                     {
                         {":organizationId", new AttributeValue {N = organizationId.ToString()}},
-                        {":sortKey", new AttributeValue {S = "-"}} // limit to only records without userId and therefore sortKey starting with -{widgetName}
+                        {":sortKey", new AttributeValue {S = "org-"}}
                     }
                 };
                 
