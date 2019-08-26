@@ -10,6 +10,10 @@ This command runs a local dynamodb container, runs a migration container to crea
 
 ## Queries
 
+```
+An exported postman collection is available in postman folder
+```
+
 - Save widget state by organization id and user id
 
 ```
